@@ -1,3 +1,20 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2026, Arm Limited and affiliates.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "cmsis.h"
 #include "objects.h"
 #include "platform/mbed_error.h"
@@ -7,67 +24,30 @@
 #include "hardware/clocks.h"
 #include "hardware/sync.h"
 #include "pico/binary_info.h"
+#include "pico/runtime_init.h"
 
 #include <stdarg.h>
 
 int mbed_sdk_inited = 0;
 
-uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[48];
-
 void mbed_sdk_init()
 {
-    // This function is adapted from the Pico SDK's runtime_init()
+    // Reset all peripherals to put system into a known state
+    runtime_init_early_resets();
 
-    // Reset all peripherals to put system into a known state,
-    // - except for QSPI pads and the XIP IO bank, as this is fatal if running from flash
-    // - and the PLLs, as this is fatal if clock muxing has not been reset on this boot
-    reset_block(~(
-            RESETS_RESET_IO_QSPI_BITS |
-            RESETS_RESET_PADS_QSPI_BITS |
-            RESETS_RESET_PLL_USB_BITS |
-            RESETS_RESET_PLL_SYS_BITS
-    ));
+    // Ensure USB PHY is in low-power state -- must be cleared before beginning USB operations.
+    runtime_init_usb_power_down();
 
-    // Remove reset from peripherals which are clocked only by clk_sys and
-    // clk_ref. Other peripherals stay in reset until we've configured clocks.
-    unreset_block_wait(RESETS_RESET_BITS & ~(
-            RESETS_RESET_ADC_BITS |
-            RESETS_RESET_RTC_BITS |
-            RESETS_RESET_SPI0_BITS |
-            RESETS_RESET_SPI1_BITS |
-            RESETS_RESET_UART0_BITS |
-            RESETS_RESET_UART1_BITS |
-            RESETS_RESET_USBCTRL_BITS
-    ));
-
-    // After calling preinit we have enough runtime to do the exciting maths
-    // in clocks_init
-    clocks_init();
+    // Set up clock tree
+    runtime_init_clocks();
+    runtime_init_post_clock_resets();
     SystemCoreClockUpdate();
 
-    // Peripheral clocks should now all be running
-    unreset_block_wait(RESETS_RESET_BITS);
+    // After resetting BANK0 we should disable IE on 26-29 as these may have mid-rail voltages when
+    // ADC is in use
+    runtime_init_rp2040_gpio_ie_disable();
 
-#if !PICO_IE_26_29_UNCHANGED_ON_RESET
-    // after resetting BANK0 we should disable IE on 26-29
-    hw_clear_alias(padsbank0_hw)->io[26] = hw_clear_alias(padsbank0_hw)->io[27] =
-            hw_clear_alias(padsbank0_hw)->io[28] = hw_clear_alias(padsbank0_hw)->io[29] = PADS_BANK0_GPIO0_IE_BITS;
-#endif
-
-#if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
-    __builtin_memcpy(ram_vector_table, (uint32_t *) SCB->VTOR, sizeof(ram_vector_table));
-    SCB->VTOR = (intptr_t) ram_vector_table;
-#endif
-
-#ifndef NDEBUG
-    uint32_t xpsr;
-    __asm volatile ("mrs %0, XPSR" : "=r" (xpsr)::);
-    if (xpsr & 0xffu) {
-        // crap; started in exception handler
-        __asm ("bkpt #0");
-    }
-#endif
-
+    // Release all spin locks
     spin_locks_reset();
 
 	mbed_sdk_inited = 1;

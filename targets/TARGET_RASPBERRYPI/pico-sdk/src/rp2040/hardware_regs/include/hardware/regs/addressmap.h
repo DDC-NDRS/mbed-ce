@@ -1,39 +1,31 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#ifndef _ADDRESSMAP_H_
-#define _ADDRESSMAP_H_
+#ifndef _ADDRESSMAP_H
+#define _ADDRESSMAP_H
+
+/**
+ * \file rp2040/addressmap.h
+ */
 
 #include "hardware/platform_defs.h"
 
 // Register address offsets for atomic RMW aliases
-#define REG_ALIAS_RW_BITS  (0x0u << 12u)
-#define REG_ALIAS_XOR_BITS (0x1u << 12u)
-#define REG_ALIAS_SET_BITS (0x2u << 12u)
-#define REG_ALIAS_CLR_BITS (0x3u << 12u)
+#define REG_ALIAS_RW_BITS  (_u(0x0) << _u(12))
+#define REG_ALIAS_XOR_BITS (_u(0x1) << _u(12))
+#define REG_ALIAS_SET_BITS (_u(0x2) << _u(12))
+#define REG_ALIAS_CLR_BITS (_u(0x3) << _u(12))
 
-#define ROM_BASE _u(0x00000000)
-#define XIP_BASE _u(0x10000000)
-#define XIP_MAIN_BASE _u(0x10000000)
-#define XIP_NOALLOC_BASE _u(0x11000000)
-#define XIP_NOCACHE_BASE _u(0x12000000)
-#define XIP_NOCACHE_NOALLOC_BASE _u(0x13000000)
+// Peripheral base addresses. These are defined in the CMSIS header so include it
+// if it's available (and we are not being included from assembly)
+#if __has_include(<RP2040.h>) && !defined(__ASSEMBLER__)
+#include <RP2040.h>
+#else
 #define XIP_CTRL_BASE _u(0x14000000)
-#define XIP_SRAM_BASE _u(0x15000000)
-#define XIP_SRAM_END _u(0x15004000)
-#define XIP_SSI_BASE _u(0x18000000)
-#define SRAM_BASE _u(0x20000000)
-#define SRAM_STRIPED_BASE _u(0x20000000)
-#define SRAM_STRIPED_END _u(0x20040000)
-#define SRAM4_BASE _u(0x20040000)
-#define SRAM5_BASE _u(0x20041000)
-#define SRAM_END _u(0x20042000)
-#define SRAM0_BASE _u(0x21000000)
-#define SRAM1_BASE _u(0x21010000)
-#define SRAM2_BASE _u(0x21020000)
-#define SRAM3_BASE _u(0x21030000)
 #define SYSINFO_BASE _u(0x40000000)
 #define SYSCFG_BASE _u(0x40004000)
 #define CLOCKS_BASE _u(0x40008000)
@@ -62,13 +54,36 @@
 #define VREG_AND_CHIP_RESET_BASE _u(0x40064000)
 #define TBMAN_BASE _u(0x4006c000)
 #define DMA_BASE _u(0x50000000)
+#define PIO0_BASE _u(0x50200000)
+#define PIO1_BASE _u(0x50300000)
+#define SIO_BASE _u(0xd0000000)
+#define PPB_BASE _u(0xe0000000)
+#endif
+
+// Additional base addresses which are not defined in the CMSIS header
+#define ROM_BASE _u(0x00000000)
+#define XIP_BASE _u(0x10000000)
+#define XIP_MAIN_BASE _u(0x10000000)
+#define XIP_NOALLOC_BASE _u(0x11000000)
+#define XIP_NOCACHE_BASE _u(0x12000000)
+#define XIP_NOCACHE_NOALLOC_BASE _u(0x13000000)
+#define XIP_SRAM_BASE _u(0x15000000)
+#define XIP_SRAM_END _u(0x15004000)
+#define XIP_SSI_BASE _u(0x18000000)
+#define SRAM_BASE _u(0x20000000)
+#define SRAM_STRIPED_BASE _u(0x20000000)
+#define SRAM_STRIPED_END _u(0x20040000)
+#define SRAM4_BASE _u(0x20040000)
+#define SRAM5_BASE _u(0x20041000)
+#define SRAM_END _u(0x20042000)
+#define SRAM0_BASE _u(0x21000000)
+#define SRAM1_BASE _u(0x21010000)
+#define SRAM2_BASE _u(0x21020000)
+#define SRAM3_BASE _u(0x21030000)
 #define USBCTRL_DPRAM_BASE _u(0x50100000)
 #define USBCTRL_BASE _u(0x50100000)
 #define USBCTRL_REGS_BASE _u(0x50110000)
-#define PIO0_BASE _u(0x50200000)
-#define PIO1_BASE _u(0x50300000)
 #define XIP_AUX_BASE _u(0x50400000)
-#define SIO_BASE _u(0xd0000000)
-#define PPB_BASE _u(0xe0000000)
 
-#endif // _ADDRESSMAP_H_
+#endif // _ADDRESSMAP_H
+
