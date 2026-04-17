@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2026 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -22,11 +22,11 @@
 
 /* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 !!GlobalInfo
-product: Clocks v11.0
+product: Clocks v20.0
 processor: MIMXRT1052xxxxB
 package_id: MIMXRT1052DVL6B
 mcu_data: ksdk2_0
-processor_version: 13.0.2
+processor_version: 26.03.10
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 
 #include "clock_config.h"
@@ -45,7 +45,6 @@ processor_version: 13.0.2
  ******************************************************************************/
 void BOARD_InitBootClocks(void)
 {
-    BOARD_ClockOverdrive();
 }
 
 /*******************************************************************************
@@ -71,7 +70,7 @@ outputs:
 - {id: IPG_CLK_ROOT.outFreq, value: 132 MHz}
 - {id: LCDIF_CLK_ROOT.outFreq, value: 67.5 MHz}
 - {id: LPI2C_CLK_ROOT.outFreq, value: 10 MHz}
-- {id: LPSPI_CLK_ROOT.outFreq, value: 2880/77 MHz}
+- {id: LPSPI_CLK_ROOT.outFreq, value: 105.6 MHz}
 - {id: LVDS1_CLK.outFreq, value: 1.056 GHz}
 - {id: MQS_MCLK.outFreq, value: 1080/17 MHz}
 - {id: PERCLK_CLK_ROOT.outFreq, value: 24 MHz}
@@ -90,16 +89,15 @@ outputs:
 - {id: SPDIF0_CLK_ROOT.outFreq, value: 30 MHz}
 - {id: TRACE_CLK_ROOT.outFreq, value: 352/3 MHz}
 - {id: UART_CLK_ROOT.outFreq, value: 24 MHz}
-- {id: USDHC1_CLK_ROOT.outFreq, value: 198 MHz}
-- {id: USDHC2_CLK_ROOT.outFreq, value: 198 MHz}
+- {id: USDHC1_CLK_ROOT.outFreq, value: 176 MHz}
+- {id: USDHC2_CLK_ROOT.outFreq, value: 176 MHz}
 settings:
 - {id: CCM.AHB_PODF.scale, value: '1', locked: true}
 - {id: CCM.ARM_PODF.scale, value: '2', locked: true}
 - {id: CCM.FLEXSPI_PODF.scale, value: '3', locked: true}
 - {id: CCM.FLEXSPI_SEL.sel, value: CCM.PLL3_SW_CLK_SEL}
 - {id: CCM.LPI2C_CLK_PODF.scale, value: '6', locked: true}
-- {id: CCM.LPSPI_CLK_SEL.sel, value: CCM_ANALOG.PLL3_PFD0_CLK}
-- {id: CCM.LPSPI_PODF.scale, value: '7', locked: true}
+- {id: CCM.LPSPI_PODF.scale, value: '5', locked: true}
 - {id: CCM.PERCLK_CLK_SEL.sel, value: XTALOSC24M.OSC_CLK}
 - {id: CCM.PERCLK_PODF.scale, value: '1', locked: true}
 - {id: CCM.SEMC_PODF.scale, value: '8'}
@@ -114,6 +112,7 @@ settings:
 - {id: CCM_ANALOG.PLL2_PFD0_BYPASS.sel, value: CCM_ANALOG.PLL2_PFD0}
 - {id: CCM_ANALOG.PLL2_PFD1_BYPASS.sel, value: CCM_ANALOG.PLL2_PFD1}
 - {id: CCM_ANALOG.PLL2_PFD2_BYPASS.sel, value: CCM_ANALOG.PLL2_PFD2}
+- {id: CCM_ANALOG.PLL2_PFD2_DIV.scale, value: '27'}
 - {id: CCM_ANALOG.PLL2_PFD3_BYPASS.sel, value: CCM_ANALOG.PLL2_PFD3}
 - {id: CCM_ANALOG.PLL3_BYPASS.sel, value: CCM_ANALOG.PLL3}
 - {id: CCM_ANALOG.PLL3_PFD0_BYPASS.sel, value: CCM_ANALOG.PLL3_PFD0}
@@ -247,9 +246,9 @@ void BOARD_ClockFullSpeed(void)
     CLOCK_DisableClock(kCLOCK_Lpspi3);
     CLOCK_DisableClock(kCLOCK_Lpspi4);
     /* Set LPSPI_PODF. */
-    CLOCK_SetDiv(kCLOCK_LpspiDiv, 6);
+    CLOCK_SetDiv(kCLOCK_LpspiDiv, 4);
     /* Set Lpspi clock source. */
-    CLOCK_SetMux(kCLOCK_LpspiMux, 1);
+    CLOCK_SetMux(kCLOCK_LpspiMux, 2);
     /* Disable TRACE clock gate. */
     CLOCK_DisableClock(kCLOCK_Trace);
     /* Set TRACE_PODF. */
@@ -360,7 +359,7 @@ void BOARD_ClockFullSpeed(void)
     /* Init System pfd1. */
     CLOCK_InitSysPfd(kCLOCK_Pfd1, 16);
     /* Init System pfd2. */
-    CLOCK_InitSysPfd(kCLOCK_Pfd2, 24);
+    CLOCK_InitSysPfd(kCLOCK_Pfd2, 27);
     /* Init System pfd3. */
     CLOCK_InitSysPfd(kCLOCK_Pfd3, 16);
 #endif
@@ -473,7 +472,6 @@ void BOARD_ClockFullSpeed(void)
 /* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 !!Configuration
 name: BOARD_ClockOverdrive
-called_from_default_init: true
 outputs:
 - {id: AHB_CLK_ROOT.outFreq, value: 600 MHz}
 - {id: CAN_CLK_ROOT.outFreq, value: 40 MHz}
@@ -491,7 +489,7 @@ outputs:
 - {id: IPG_CLK_ROOT.outFreq, value: 150 MHz}
 - {id: LCDIF_CLK_ROOT.outFreq, value: 67.5 MHz}
 - {id: LPI2C_CLK_ROOT.outFreq, value: 10 MHz}
-- {id: LPSPI_CLK_ROOT.outFreq, value: 2880/77 MHz}
+- {id: LPSPI_CLK_ROOT.outFreq, value: 105.6 MHz}
 - {id: LVDS1_CLK.outFreq, value: 1.2 GHz}
 - {id: MQS_MCLK.outFreq, value: 1080/17 MHz}
 - {id: PERCLK_CLK_ROOT.outFreq, value: 24 MHz}
@@ -518,8 +516,7 @@ settings:
 - {id: CCM.FLEXSPI_PODF.scale, value: '3', locked: true}
 - {id: CCM.FLEXSPI_SEL.sel, value: CCM.PLL3_SW_CLK_SEL}
 - {id: CCM.LPI2C_CLK_PODF.scale, value: '6', locked: true}
-- {id: CCM.LPSPI_CLK_SEL.sel, value: CCM_ANALOG.PLL3_PFD0_CLK}
-- {id: CCM.LPSPI_PODF.scale, value: '7', locked: true}
+- {id: CCM.LPSPI_PODF.scale, value: '5', locked: true}
 - {id: CCM.PERCLK_CLK_SEL.sel, value: XTALOSC24M.OSC_CLK}
 - {id: CCM.PERCLK_PODF.scale, value: '1', locked: true}
 - {id: CCM.SEMC_PODF.scale, value: '8'}
@@ -673,9 +670,9 @@ void BOARD_ClockOverdrive(void)
     CLOCK_DisableClock(kCLOCK_Lpspi3);
     CLOCK_DisableClock(kCLOCK_Lpspi4);
     /* Set LPSPI_PODF. */
-    CLOCK_SetDiv(kCLOCK_LpspiDiv, 6);
+    CLOCK_SetDiv(kCLOCK_LpspiDiv, 4);
     /* Set Lpspi clock source. */
-    CLOCK_SetMux(kCLOCK_LpspiMux, 1);
+    CLOCK_SetMux(kCLOCK_LpspiMux, 2);
     /* Disable TRACE clock gate. */
     CLOCK_DisableClock(kCLOCK_Trace);
     /* Set TRACE_PODF. */
@@ -916,7 +913,7 @@ outputs:
 - {id: IPG_CLK_ROOT.outFreq, value: 12 MHz}
 - {id: LCDIF_CLK_ROOT.outFreq, value: 3 MHz}
 - {id: LPI2C_CLK_ROOT.outFreq, value: 3 MHz}
-- {id: LPSPI_CLK_ROOT.outFreq, value: 3 MHz}
+- {id: LPSPI_CLK_ROOT.outFreq, value: 12 MHz}
 - {id: LVDS1_CLK.outFreq, value: 24 MHz}
 - {id: MQS_MCLK.outFreq, value: 3 MHz}
 - {id: PERCLK_CLK_ROOT.outFreq, value: 24 MHz}
@@ -940,8 +937,7 @@ outputs:
 settings:
 - {id: CCM.FLEXSPI_PODF.scale, value: '1', locked: true}
 - {id: CCM.IPG_PODF.scale, value: '2', locked: true}
-- {id: CCM.LPSPI_CLK_SEL.sel, value: CCM_ANALOG.PLL3_PFD0_CLK}
-- {id: CCM.LPSPI_PODF.scale, value: '8', locked: true}
+- {id: CCM.LPSPI_PODF.scale, value: '2', locked: true}
 - {id: CCM.PERCLK_CLK_SEL.sel, value: XTALOSC24M.OSC_CLK}
 - {id: CCM.PERIPH_CLK2_SEL.sel, value: XTALOSC24M.OSC_CLK}
 - {id: CCM.PERIPH_CLK_SEL.sel, value: CCM.PERIPH_CLK2_PODF}
@@ -1049,9 +1045,9 @@ void BOARD_ClockLowPower(void)
     CLOCK_DisableClock(kCLOCK_Lpspi3);
     CLOCK_DisableClock(kCLOCK_Lpspi4);
     /* Set LPSPI_PODF. */
-    CLOCK_SetDiv(kCLOCK_LpspiDiv, 7);
+    CLOCK_SetDiv(kCLOCK_LpspiDiv, 1);
     /* Set Lpspi clock source. */
-    CLOCK_SetMux(kCLOCK_LpspiMux, 1);
+    CLOCK_SetMux(kCLOCK_LpspiMux, 2);
     /* Disable TRACE clock gate. */
     CLOCK_DisableClock(kCLOCK_Trace);
     /* Set TRACE_PODF. */
