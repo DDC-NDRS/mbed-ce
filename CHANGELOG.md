@@ -20,15 +20,24 @@ A message that notes the main changes in the update.
   - MPU configuration added
 
 ### Changed
+- Reworked targets CMake code to only recurse into the subdir for the current target family, which should speed up the CMake configure a bit
+- STM32F4
+  - HAL driver update to `stm32f4xx-hal-driver` v1.8.5 (2025), now integrated as a submodule.
+  - CMSIS device update to `cmsis-device-f4` v2.6.11 (2025), now integrated as a submodule.
+  - Standardized ROM names in `cmsis_mcu_descriptions` across STM32F4 targets.
+  - STM32F4 `system_clock.c` were consolidate into five clock configuration files that are choosed by labels in targets.json5
+  - Updated STM32F4 config/init files by consolidating Mbed changes with latest upstream templates and Ethernet HAL sections were removed from config (Mbed does not use ST Ethernet stack here)
+  - Added target metadata cleanup (`adc-vref`, `hse-value` for all F4 targets).
+  - Replaced per-target linker scripts with one common STM32F4 linker script.CCM RAM was added into STM32F4 linker script (related to F429/F439)
+  - F4 Vector table size and vector start is now covered by linker script and all cmsis_nvic.h files were removed
 - STM32F7
   - HAL driver update to `stm32f7xx-hal-driver` v1.3.3 (2025), now integrated as a submodule.
   - CMSIS device update to `cmsis-device-f7` v1.2.10 (2025), now integrated as a submodule.
   - Standardized ROM names in `cmsis_mcu_descriptions` across STM32F7 targets.
   - Replaced per-target linker scripts with one common STM32F7 linker script.
   - Replaced most STM32F7 `system_clock.c` files with one common clock configuration.
-  - Added target metadata cleanup (`adc-vref` for all F7 targets).
-  - Updated STM32F7 config/init files by consolidating Mbed changes with latest upstream templates.
-  - Removed unused Ethernet HAL sections from config (Mbed does not use ST Ethernet stack here).
+  - Added target metadata cleanup (`adc-vref`, `hse-value for all F7 targets).
+  - Updated STM32F7 config/init files by consolidating Mbed changes with latest upstream templates. Removed unused Ethernet HAL sections from config (Mbed does not use ST Ethernet stack here)
   - Applied interim local HAL fixes until upstream release includes them: https://github.com/STMicroelectronics/stm32f7xx-hal-driver/issues/23
   - `mem-size` of lwIP stack increased from default 4000 to 16384
 - RP2xxx
@@ -47,6 +56,8 @@ A message that notes the main changes in the update.
 
 ### Removed
 - Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7)
+- Target ARCH MAX (STM32F407) has been removed due to market availability - discontinued (still possible to use it with release Mbed-os 7)
+- STM32F4 MCUs without dev board were removed 26/34 (still possible to use it with release Mbed-os 7). Will be covered by Custom target.
 
 ### Security
 
